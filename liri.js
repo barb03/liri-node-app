@@ -7,3 +7,4 @@ var keys = require('./keys.js');
 //You should then be able to access your keys information like so
 var spotify = new Spotify(keys.spotify);
 
+//I want to see if gitignore is ignoring the dot.env file.
