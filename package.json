@@ -5,7 +5,9 @@
   "main": "keys.js",
   "dependencies": {
     "axios": "^0.18.0",
-    "chalk": "^2.4.1"
+    "dotenv": "^6.1.0",
+    "moment": "^2.22.2",
+    "node-spotify-api": "^1.0.7"
   },
   "devDependencies": {},
   "scripts": {
@@ -15,7 +17,6 @@
     "type": "git",
     "url": "git+https://github.com/barb03/liri-node-app.git"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
