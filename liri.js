@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-var Client = require('twitter');
+var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
 var keys = require('./keys.js');
 var spotify = new Spotify(keys.spotify);
@@ -9,16 +9,15 @@ var fs = require('fs');
 var moment = require('moment');
 var chalk = require('chalk');
 
-var getMyTweets = function(){	
-	var client = new Client(keys.twitterKeys);
-	var params = {screen_name: inputs, count: 20};
-	// var params = {screen_name: '@MustangSalliee'};
-	client.get('statuses/user_timeline', params, function(error, tweets, response){
+var getMyTweets = function(){
+	var client = new Twitter(keys.twitter);	
+	var screenName = {screen_name: '@MustangSalliee'};		
+	client.get('statuses/user_timeline', screenName, function(error, tweets, response){
 		if(!error){
 			for(var i=0; i<tweets.length; i++){
-				console.log(tweets[i].created_at);
-				console.log('');
+				console.log(tweets[i].created_at);				
 				console.log(tweets[i].text);
+				console.log(chalk.magenta('----------------------------------------------------'));
 			}		
 		}
 		else{
@@ -54,7 +53,10 @@ var getArtistNames = function(artist){
 		   }
 		   else{
 				console.log('preview song: ' + songs[i].preview_url);
-		   }		   
+		   }
+		   fs.appendFile("log.txt", "\n========= Result "+ (i+1) +" =========\nArtist: " + songs[i].artists.map(getArtistNames) + "\nSong title: " 
+			+ songs[i].name + "\nAlbum name: " + songs[i].album.name + "\nURL Preview: " + songs[i].preview_url 
+			+ "\n=============================\n", errorFunction());		   
 		   console.log(chalk.magenta('----------------------------------------------------'));
 	   }	   
 	});	
