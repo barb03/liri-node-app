@@ -10,7 +10,8 @@ var moment = require('moment');
 
 var getMyTweets = function(){	
 	var client = new Client(keys.twitterKeys);
-	var params = {screen_name: '@MustangSalliee'};
+	var params = {screen_name: inputs, count: 20};
+	// var params = {screen_name: '@MustangSalliee'};
 	client.get('statuses/user_timeline', params, function(error, tweets, response){
 		if(!error){
 			for(var i=0; i<tweets.length; i++){
@@ -31,7 +32,7 @@ var getArtistNames = function(artist){
 
  var getMySpotify = function(songName){
 	if(!songName){
-		songName = 'The+Sign';
+		songName = '"The Sign" Ace of Base';
 		console.log(songName);
 	}
 	spotify.search({ type: 'track', query: songName }, function(err, data) {
@@ -45,16 +46,17 @@ var getArtistNames = function(artist){
 		   console.log(i);
 		   console.log('artist(s): ' + songs[i].artists.map(getArtistNames));		   
 		   console.log('song name: ' + songs[i].name);
-		   console.log('preview song: ' + songs[i].preview_url);
+		   if(songs[i].preview_url == null){
+				console.log('preview song is not available.')				
+		   }
+		   else{
+				console.log('preview song: ' + songs[i].preview_url);
+		   }   
 		   console.log('album: ' + songs[i].album.name);
 		   console.log('----------------------------------------------------');
-	   }
-	   
-	   
+	   }	   
 	});	
  }
- 
- 
 
  var getMyMovie = function(movieName){	
 	if(!movieName){
@@ -62,8 +64,8 @@ var getArtistNames = function(artist){
 		console.log(movieName);
 	}	
 	request('http://www.omdbapi.com/?t=' + movieName + '&y=&plot=short&apikey=trilogy', function (error, response, body) {		
-	if(!error && response.statusCode == 200){
-			var jsonData = JSON.parse(body);
+	if(!error && response.statusCode == 200){			
+			console.log(body);
 			console.log('Title: ' + jsonData.Title);
 			console.log('Year: ' + jsonData.Year);
 			console.log('Rated: ' + jsonData.Rated);
@@ -71,10 +73,8 @@ var getArtistNames = function(artist){
 			console.log('Country: ' + jsonData.Country);
 			console.log('Language: ' + jsonData.Language);
 			console.log('Plot: ' + jsonData.Plot);
-			console.log('Actors: ' + jsonData.Actors);
-			
-			
-				console.log('Rotten Tomatoes Rating: ' + jsonData.tomatoeRating);
+			console.log('Actors: ' + jsonData.Actors);			
+			console.log('Rotten Tomatoes Rating: ' + JSON.parse(body).Ratings[1].Value);
 							
 		}		
 	});
