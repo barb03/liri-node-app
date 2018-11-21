@@ -36,8 +36,8 @@ var getArtistNames = function(artist){
 		console.log(songName);
 	}
 	spotify.search({ type: 'track', query: songName }, function(err, data) {
-		if ( err ) {
-			console.log('Error occurred: ' + err);
+		if (err) {
+			console.log(err);
 			return;
 		}		
 
@@ -53,11 +53,7 @@ var getArtistNames = function(artist){
 		   }
 		   else{
 				console.log('preview song: ' + songs[i].preview_url);
-		   }
-		   fs.appendFile("log.txt", "\n========= Result "+ (i+1) +" =========\nArtist: " + songs[i].artists.map(getArtistNames) + "\nSong title: " 
-			+ songs[i].name + "\nAlbum name: " + songs[i].album.name + "\nURL Preview: " + songs[i].preview_url 
-			+ "\n=============================\n", errorFunction());		   
-		   console.log(chalk.magenta('----------------------------------------------------'));
+		   }	   
 	   }	   
 	});	
  }
@@ -83,9 +79,10 @@ var getArtistNames = function(artist){
 			console.log(chalk.magenta('---------------------- Actors ----------------------'));
 			console.log('Actors: ' + jsonData.Actors);	
 			console.log(chalk.yellow('------------------ Rotten Tomatoes ------------------'));		
-			console.log('Rotten Tomatoes Rating: ' + JSON.parse(body).Ratings[1].Value);
-			
-							
+			console.log('Rotten Tomatoes Rating: ' + JSON.parse(body).Ratings[1].Value);							
+		}
+		else{
+			console.log(error);
 		}		
 	});
  }
@@ -120,10 +117,10 @@ var getArtistNames = function(artist){
 	});
 }
 
-var pick = function(caseData, functionData){
+var pick = function(caseData, functionData){	
 	switch(caseData){
 		case 'my-tweets':
-			getMyTweets();
+			getMyTweets();			
 			break;
 		case 'spotify-this-song':
 			getMySpotify(functionData);
@@ -141,6 +138,9 @@ var pick = function(caseData, functionData){
 			console.log('Liri does not know that');
 	}
 }
+
+
+
 var runThis = function(argOne, argTwo){
 	pick(argOne, argTwo);
 };
