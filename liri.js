@@ -1,38 +1,44 @@
 require('dotenv').config();
-// var keys = require("./keys.js");
 
-// var Twitter = required('twitter');
-
+var Client = require('twitter');
 var Spotify = require('node-spotify-api');
 var keys = require('./keys.js');
 var spotify = new Spotify(keys.spotify);
 var request = require('request');
 var fs = require('fs');
+var moment = require('moment');
 
-// var getMyTweets = function(){
-// 	var client = new Twitter(keys.twitterKeys);
-// 	var params = {screen_name: 'inrtracker'};
-// 	client.get('statuses/user_timeline', params, function(error, tweets, response){
-// 		if('error'){
-// 			for(var i=0; i<tweets.length; i++){
-// 				console.log(tweets[i].created_at);
-// 				console.log('');
-// 				console.log(tweets[i].text);
-// 			}
-// 		}
-// 	});
-// }
+var getMyTweets = function(){	
+	var client = new Client(keys.twitterKeys);
+	var params = {screen_name: '@MustangSalliee'};
+	client.get('statuses/user_timeline', params, function(error, tweets, response){
+		if(!error){
+			for(var i=0; i<tweets.length; i++){
+				console.log(tweets[i].created_at);
+				console.log('');
+				console.log(tweets[i].text);
+			}		
+		}
+		else{
+			console.log(error);
+		}
+	});
+}
 
 var getArtistNames = function(artist){
 	return artist.name;
 }
 
  var getMySpotify = function(songName){
+	if(!songName){
+		songName = 'The+Sign';
+		console.log(songName);
+	}
 	spotify.search({ type: 'track', query: songName }, function(err, data) {
 		if ( err ) {
 			console.log('Error occurred: ' + err);
 			return;
-		}	
+		}		
 
 	   var songs = data.tracks.items;
 	   for(var i=0; i<songs.length; i++){
@@ -43,25 +49,49 @@ var getArtistNames = function(artist){
 		   console.log('album: ' + songs[i].album.name);
 		   console.log('----------------------------------------------------');
 	   }
-	});
+	   
+	   
+	});	
  }
+ 
+ 
 
- var getMyMovie = function(movieName){
-	request('http://www.omdbapi.com/?t=' + movieName + '&y=&plot=short&apikey=trilogy', function (error, response, body) {
-		if(!error && response.statusCode == 200){
+ var getMyMovie = function(movieName){	
+	if(!movieName){
+		movieName = 'Mr. Nobody';
+		console.log(movieName);
+	}	
+	request('http://www.omdbapi.com/?t=' + movieName + '&y=&plot=short&apikey=trilogy', function (error, response, body) {		
+	if(!error && response.statusCode == 200){
 			var jsonData = JSON.parse(body);
 			console.log('Title: ' + jsonData.Title);
 			console.log('Year: ' + jsonData.Year);
 			console.log('Rated: ' + jsonData.Rated);
-			console.log('IMDB Rating: ' + jsonData.imdbRating);
+			console.log('IMDB Rating: ' + jsonData.imdbRating);				
 			console.log('Country: ' + jsonData.Country);
 			console.log('Language: ' + jsonData.Language);
 			console.log('Plot: ' + jsonData.Plot);
 			console.log('Actors: ' + jsonData.Actors);
-			console.log('Rotten Tomatoes Rating: ' + jsonData.tomatoeRating);
-			console.log('Rotting Tomatoes URL: ' + jsonData.tomatoURL);			
+			
+			
+				console.log('Rotten Tomatoes Rating: ' + jsonData.tomatoeRating);
+							
 		}		
 	});
+ }
+
+ var getConcert = function(artist){
+	 request('https://rest.bandsintown.com/artists/' + artist + '/events?app_id=codingbootcamp', function(error, response, body){
+		 if(!error){
+			 var result = JSON.parse(body)[0];
+			 console.log('Venue Name: ' + result.venue.name);
+			 console.log('Venue Location: ' + result.venue.city);
+			 console.log('Date of Event: ' + moment(result.datetime).format("MM/DD/YYYY"));
+		 }
+		 else{
+			 console.log(error);
+		 }
+	 });
  }
 
  function doWhatItSays(){
@@ -81,9 +111,9 @@ var getArtistNames = function(artist){
 
 var pick = function(caseData, functionData){
 	switch(caseData){
-	// 	case 'my-tweets':
-	// 		getMyTweets();
-	// 		break;
+		case 'my-tweets':
+			getMyTweets();
+			break;
 		case 'spotify-this-song':
 			getMySpotify(functionData);
 			break;
@@ -92,6 +122,9 @@ var pick = function(caseData, functionData){
 			break;
 		case 'do-what-it-says':
 			doWhatItSays();
+			break;
+		case 'concert-this':
+			getConcert();
 			break;
 		default:
 			console.log('Liri does not know that');
