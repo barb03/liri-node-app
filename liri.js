@@ -7,6 +7,7 @@ var spotify = new Spotify(keys.spotify);
 var request = require('request');
 var fs = require('fs');
 var moment = require('moment');
+var chalk = require('chalk');
 
 var getMyTweets = function(){	
 	var client = new Client(keys.twitterKeys);
@@ -44,16 +45,17 @@ var getArtistNames = function(artist){
 	   var songs = data.tracks.items;
 	   for(var i=0; i<songs.length; i++){
 		   console.log(i);
-		   console.log('artist(s): ' + songs[i].artists.map(getArtistNames));		   
+		   console.log(chalk.green('----------------- Song Information -----------------'));		  
+		   console.log('artist(s): ' + songs[i].artists.map(getArtistNames));		      
 		   console.log('song name: ' + songs[i].name);
+		   console.log('album: ' + songs[i].album.name);		   
 		   if(songs[i].preview_url == null){
 				console.log('preview song is not available.')				
 		   }
 		   else{
 				console.log('preview song: ' + songs[i].preview_url);
-		   }   
-		   console.log('album: ' + songs[i].album.name);
-		   console.log('----------------------------------------------------');
+		   }		   
+		   console.log(chalk.magenta('----------------------------------------------------'));
 	   }	   
 	});	
  }
@@ -65,16 +67,22 @@ var getArtistNames = function(artist){
 	}	
 	request('http://www.omdbapi.com/?t=' + movieName + '&y=&plot=short&apikey=trilogy', function (error, response, body) {		
 	if(!error && response.statusCode == 200){			
-			console.log(body);
+			// console.log(body);
+			var jsonData = JSON.parse(body);
+			console.log(chalk.green('-------------------- Movie Data --------------------'));
 			console.log('Title: ' + jsonData.Title);
 			console.log('Year: ' + jsonData.Year);
 			console.log('Rated: ' + jsonData.Rated);
 			console.log('IMDB Rating: ' + jsonData.imdbRating);				
 			console.log('Country: ' + jsonData.Country);
 			console.log('Language: ' + jsonData.Language);
+			console.log(chalk.cyan('----------------------- Plot -----------------------'));
 			console.log('Plot: ' + jsonData.Plot);
-			console.log('Actors: ' + jsonData.Actors);			
+			console.log(chalk.magenta('---------------------- Actors ----------------------'));
+			console.log('Actors: ' + jsonData.Actors);	
+			console.log(chalk.yellow('------------------ Rotten Tomatoes ------------------'));		
 			console.log('Rotten Tomatoes Rating: ' + JSON.parse(body).Ratings[1].Value);
+			
 							
 		}		
 	});
@@ -84,9 +92,10 @@ var getArtistNames = function(artist){
 	 request('https://rest.bandsintown.com/artists/' + artist + '/events?app_id=codingbootcamp', function(error, response, body){
 		 if(!error){
 			 var result = JSON.parse(body)[0];
+			 console.log(chalk.magenta('-------------------- Concert Data --------------------'));
 			 console.log('Venue Name: ' + result.venue.name);
 			 console.log('Venue Location: ' + result.venue.city);
-			 console.log('Date of Event: ' + moment(result.datetime).format("MM/DD/YYYY"));
+			 console.log('Date of Event: ' + moment(result.datetime).format("MM/DD/YYYY"));			 
 		 }
 		 else{
 			 console.log(error);
