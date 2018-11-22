@@ -13,17 +13,25 @@ var getMyTweets = function(){
 	var client = new Twitter(keys.twitter);	
 	var screenName = {screen_name: '@MustangSalliee'};		
 	client.get('statuses/user_timeline', screenName, function(error, tweets, response){
-		if(!error){
+		
+		if(!error){			
 			for(var i=0; i<tweets.length; i++){
 				console.log(tweets[i].created_at);				
 				console.log(tweets[i].text);
 				console.log(chalk.magenta('----------------------------------------------------'));
+				
+				var twitterResults = 
+					"@" + tweets[i].user.screen_name + ': ' + 
+					tweets[i].text + '\r\n' + 
+					tweets[i].created_at + '\r\n' + 
+					'------------------------------ ' + i + ' ------------------------------' + '\r\n';					
+					log(twitterResults); 					
 			}		
 		}
 		else{
 			console.log(error);
-		}
-	});
+		}		
+	});	
 }
 
 var getArtistNames = function(artist){
@@ -40,20 +48,27 @@ var getArtistNames = function(artist){
 			console.log(err);
 			return;
 		}		
-
 	   var songs = data.tracks.items;
 	   for(var i=0; i<songs.length; i++){
+		var songLog = data.tracks.items;
 		   console.log(i);
 		   console.log(chalk.green('----------------- Song Information -----------------'));		  
-		   console.log('artist(s): ' + songs[i].artists.map(getArtistNames));		      
-		   console.log('song name: ' + songs[i].name);
-		   console.log('album: ' + songs[i].album.name);		   
+		   console.log('Artist(s): ' + songs[i].artists.map(getArtistNames));		      
+		   console.log('Song Name: ' + songs[i].name);
+		   console.log('Album: ' + songs[i].album.name);		   
 		   if(songs[i].preview_url == null){
 				console.log('preview song is not available.')				
 		   }
 		   else{
 				console.log('preview song: ' + songs[i].preview_url);
-		   }	   
+		   }
+		   var spotifyResults =
+						'Artist: ' + songLog[i].artists[0].name + '\r\n' +
+						'Song: ' + songLog[i].name + '\r\n' +
+						'Album the song is from: ' + songLog[i].album.name + '\r\n' +
+						'Preview Url: ' + songLog[i].preview_url + '\r\n' + 
+						'------------------------------ ' + i + ' ------------------------------' + '\r\n';						
+						log(spotifyResults); 
 	   }	   
 	});	
  }
@@ -62,9 +77,11 @@ var getArtistNames = function(artist){
 	if(!movieName){
 		movieName = 'Mr. Nobody';
 		console.log(movieName);
+		console.log("If you haven't watched 'Mr. Nobody,' then you should: http://www.imdb.com/title/tt0485947/");
+        console.log("It's on Netflix!");
 	}	
 	request('http://www.omdbapi.com/?t=' + movieName + '&y=&plot=short&apikey=trilogy', function (error, response, body) {		
-	if(!error && response.statusCode == 200){			
+		if(!error && response.statusCode == 200){			
 			// console.log(body);
 			var jsonData = JSON.parse(body);
 			console.log(chalk.green('-------------------- Movie Data --------------------'));
@@ -79,7 +96,20 @@ var getArtistNames = function(artist){
 			console.log(chalk.magenta('---------------------- Actors ----------------------'));
 			console.log('Actors: ' + jsonData.Actors);	
 			console.log(chalk.yellow('------------------ Rotten Tomatoes ------------------'));		
-			console.log('Rotten Tomatoes Rating: ' + JSON.parse(body).Ratings[1].Value);							
+			console.log('Rotten Tomatoes Rating: ' + JSON.parse(body).Ratings[1].Value);
+			
+			var movieResults =
+				'------------------------------ Movie Data ------------------------------' + '\r\n' +
+				'Title: ' + jsonData.Title +'\r\n' +
+				'Year: ' + jsonData.Year + '\r\n' +
+				'IMDB Rating: ' + jsonData.Rated + '\r\n' +
+				'Country: ' + jsonData.Country + '\r\n' +
+				'Language: ' + jsonData.Language + '\r\n' +
+				'Plot: ' + jsonData.Plot + '\r\n' +
+				'Actors: ' + jsonData.Actors + '\r\n' +
+				'Rotten Tomatoes Rating: ' + JSON.parse(body).Ratings[1].Value + '\r\n' +				
+				'---------------------------- End Movie Data ----------------------------' + '\r\n';				
+				log(movieResults); 
 		}
 		else{
 			console.log(error);
@@ -89,18 +119,26 @@ var getArtistNames = function(artist){
 
  var getConcert = function(artist){
 	 request('https://rest.bandsintown.com/artists/' + artist + '/events?app_id=codingbootcamp', function(error, response, body){
-		 if(!error){
+		 if(!error){			
 			 var result = JSON.parse(body)[0];
 			 console.log(chalk.magenta('-------------------- Concert Data --------------------'));
 			 console.log('Venue Name: ' + result.venue.name);
 			 console.log('Venue Location: ' + result.venue.city);
-			 console.log('Date of Event: ' + moment(result.datetime).format("MM/DD/YYYY"));			 
+			 console.log('Date of Event: ' + moment(result.datetime).format("MM/DD/YYYY"));	
+			 
+			 var concertResults =
+				'------------------------------ Concert Data ------------------------------' + '\r\n' +
+				'Venue Name: ' + result.venue.name + '\r\n' +
+				'Venue Location: ' + result.venue.city + '\r\n' +
+				'Date of Event: ' + moment(result.datetime).format("MM/DD/YYYY") + '\r\n' +								
+				'---------------------------- End Concert Data ----------------------------' + '\r\n';				
+				log(concertResults); 
 		 }
 		 else{
 			 console.log(error);
 		 }
 	 });
- }
+ } 
 
  function doWhatItSays(){
 	fs.readFile('random.txt', 'utf8', function(err, data){
@@ -120,7 +158,7 @@ var getArtistNames = function(artist){
 var pick = function(caseData, functionData){	
 	switch(caseData){
 		case 'my-tweets':
-			getMyTweets();			
+			getMyTweets();					
 			break;
 		case 'spotify-this-song':
 			getMySpotify(functionData);
@@ -139,11 +177,21 @@ var pick = function(caseData, functionData){
 	}
 }
 
-
+function log(logResults) {
+	fs.appendFile("log.txt", logResults, (error) => {
+	  if(error) {
+		throw error;
+	  }
+	});
+  }
 
 var runThis = function(argOne, argTwo){
 	pick(argOne, argTwo);
 };
 
 runThis(process.argv[2], process.argv[3]);
+ 
+
+
+  
 

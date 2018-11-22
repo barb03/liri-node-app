@@ -10,8 +10,10 @@
     "moment": "^2.22.2",
     "node-spotify-api": "^1.0.7",
     "request": "^2.88.0",
+    "simple-node-logger": "^0.93.40",
     "spotify": "^0.3.0",
-    "twitter": "^1.7.1"
+    "twitter": "^1.7.1",
+    "winston": "^3.1.0"
   },
   "devDependencies": {},
   "scripts": {
