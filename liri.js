@@ -1,5 +1,5 @@
+// variables and requires
 require('dotenv').config();
-
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
 var keys = require('./keys.js');
@@ -9,17 +9,17 @@ var fs = require('fs');
 var moment = require('moment');
 var chalk = require('chalk');
 
+// function to get my tweets
 var getMyTweets = function(){
 	var client = new Twitter(keys.twitter);	
 	var screenName = {screen_name: '@MustangSalliee'};		
-	client.get('statuses/user_timeline', screenName, function(error, tweets, response){
-		
+	client.get('statuses/user_timeline', screenName, function(error, tweets, response){		
 		if(!error){			
 			for(var i=0; i<tweets.length; i++){
 				console.log(tweets[i].created_at);				
 				console.log(tweets[i].text);
 				console.log(chalk.magenta('----------------------------------------------------'));
-				
+				// to log the results to log.txt
 				var twitterResults = 
 					"@" + tweets[i].user.screen_name + ': ' + 
 					tweets[i].text + '\r\n' + 
@@ -34,16 +34,17 @@ var getMyTweets = function(){
 	});	
 }
 
+// function to get the artist name from the api array
 var getArtistNames = function(artist){
 	return artist.name;
 }
-
+// function to input The Sign if there is no input from the user
  var getMySpotify = function(songName){
 	if(!songName){
 		songName = '"The Sign" Ace of Base';
 		console.log(songName);
 	}
-	spotify.search({ type: 'track', query: songName }, function(err, data) {
+	spotify.search({type: 'track', query: songName}, function(err, data) {
 		if (err) {
 			console.log(err);
 			return;
@@ -62,6 +63,7 @@ var getArtistNames = function(artist){
 		   else{
 				console.log('preview song: ' + songs[i].preview_url);
 		   }
+// to log the results to log.txt
 		   var spotifyResults =
 						'Artist: ' + songLog[i].artists[0].name + '\r\n' +
 						'Song: ' + songLog[i].name + '\r\n' +
@@ -73,6 +75,7 @@ var getArtistNames = function(artist){
 	});	
  }
 
+//  function to input Mr. Nobody if there is no input from the user
  var getMyMovie = function(movieName){	
 	if(!movieName){
 		movieName = 'Mr. Nobody';
@@ -81,8 +84,7 @@ var getArtistNames = function(artist){
         console.log("It's on Netflix!");
 	}	
 	request('http://www.omdbapi.com/?t=' + movieName + '&y=&plot=short&apikey=trilogy', function (error, response, body) {		
-		if(!error && response.statusCode == 200){			
-			// console.log(body);
+		if(!error && response.statusCode == 200){				
 			var jsonData = JSON.parse(body);
 			console.log(chalk.green('-------------------- Movie Data --------------------'));
 			console.log('Title: ' + jsonData.Title);
@@ -97,7 +99,7 @@ var getArtistNames = function(artist){
 			console.log('Actors: ' + jsonData.Actors);	
 			console.log(chalk.yellow('------------------ Rotten Tomatoes ------------------'));		
 			console.log('Rotten Tomatoes Rating: ' + JSON.parse(body).Ratings[1].Value);
-			
+// to log the results to log.txt
 			var movieResults =
 				'------------------------------ Movie Data ------------------------------' + '\r\n' +
 				'Title: ' + jsonData.Title +'\r\n' +
@@ -117,29 +119,40 @@ var getArtistNames = function(artist){
 	});
  }
 
- var getConcert = function(artist){
-	 request('https://rest.bandsintown.com/artists/' + artist + '/events?app_id=codingbootcamp', function(error, response, body){
+//  function to input Kiss if there is no input from the user
+ var getConcert = function(venue){
+	if(!venue){
+		venue = 'Kiss';
+		console.log(venue);
+	}
+// request from api 
+		request('https://rest.bandsintown.com/artists/' + venue + '/events?app_id=codingbootcamp', function(error, response, body){
+		console.log(venue);		 
 		 if(!error){			
-			 var result = JSON.parse(body)[0];
+			 var result = JSON.parse(body);
+			 for(i=0; i<result.length;i++){
 			 console.log(chalk.magenta('-------------------- Concert Data --------------------'));
-			 console.log('Venue Name: ' + result.venue.name);
-			 console.log('Venue Location: ' + result.venue.city);
-			 console.log('Date of Event: ' + moment(result.datetime).format("MM/DD/YYYY"));	
-			 
+			 console.log('Artist Searched: ' + venue);			
+			 console.log('Venue Name: ' + result[i].venue.name);
+			 console.log('Venue Location: ' + result[i].venue.city);
+			 console.log('Date of Event: ' + moment(result[i].datetime).format("MM/DD/YYYY"));				 
+//  to log the results to log.txt
 			 var concertResults =
-				'------------------------------ Concert Data ------------------------------' + '\r\n' +
-				'Venue Name: ' + result.venue.name + '\r\n' +
-				'Venue Location: ' + result.venue.city + '\r\n' +
-				'Date of Event: ' + moment(result.datetime).format("MM/DD/YYYY") + '\r\n' +								
-				'---------------------------- End Concert Data ----------------------------' + '\r\n';				
+				'------------------------------------------------------------' + '\r\n' +
+				'Artist Searched: ' + venue + '\r\n' +
+				'Venue Name: ' + result[i].venue.name + '\r\n' +
+				'Venue Location: ' + result[i].venue.city + '\r\n' +
+				'Date of Event: ' + moment(result[i].datetime).format("MM/DD/YYYY") + '\r\n';								
 				log(concertResults); 
+			 }
 		 }
 		 else{
 			 console.log(error);
 		 }
 	 });
- } 
-
+ }
+ 
+// function to read from random.txt and input to the console 
  function doWhatItSays(){
 	fs.readFile('random.txt', 'utf8', function(err, data){
 		if (err){ 
@@ -155,6 +168,7 @@ var getArtistNames = function(artist){
 	});
 }
 
+// switch function for the different calls
 var pick = function(caseData, functionData){	
 	switch(caseData){
 		case 'my-tweets':
@@ -170,13 +184,14 @@ var pick = function(caseData, functionData){
 			doWhatItSays();
 			break;
 		case 'concert-this':
-			getConcert();
+			getConcert(functionData);
 			break;
 		default:
 			console.log('Liri does not know that');
 	}
 }
 
+// function to log the results to log.txt
 function log(logResults) {
 	fs.appendFile("log.txt", logResults, (error) => {
 	  if(error) {
@@ -185,6 +200,7 @@ function log(logResults) {
 	});
   }
 
+//   function to get the inputs from the user
 var runThis = function(argOne, argTwo){
 	pick(argOne, argTwo);
 };
